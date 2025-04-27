@@ -11,6 +11,9 @@ const qrFilePath = path.join(__dirname, "qr.png");
 // Flag to track QR code generation status
 let isQrGenerated = false;
 
+// Store warnings count for users
+const warningCounts = {}; // { userId: warningCount }
+
 // Start client
 const client = new Client({
   authStrategy: new LocalAuth(),
