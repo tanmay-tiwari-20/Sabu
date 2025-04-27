@@ -8,6 +8,9 @@ const app = express();
 // Path to store the QR code image
 const qrFilePath = path.join(__dirname, "qr.png");
 
+// Flag to track QR code generation status
+let isQrGenerated = false;
+
 // Start client
 const client = new Client({
   authStrategy: new LocalAuth(),
@@ -16,16 +19,16 @@ const client = new Client({
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
   },
 });
+
 client.initialize();
 
 // Serve the QR code image via an HTTP server (Express)
 app.get('/qr', (req, res) => {
-  // Check if the QR code file exists
-  if (fs.existsSync(qrFilePath)) {
+  // Check if the QR code has been generated
+  if (isQrGenerated) {
     res.sendFile(qrFilePath);
   } else {
     res.status(404).send("QR code not generated yet, please wait.");
-    console.log("qr not generated yet.")
   }
 });
 
@@ -36,14 +39,20 @@ app.get('/', (req, res) => {
 
 // Generate and save QR code as an image file
 client.on("qr", (qr) => {
-  // Generate QR code and save it to a file
-  qrcode.toFile(qrFilePath, qr, (err) => {
-    if (err) {
-      console.error("Failed to generate QR code", err);
-      return;
-    }
-    console.log("QR code saved to", qrFilePath);
-  });
+  // Check if the QR code already exists to prevent regeneration
+  if (!fs.existsSync(qrFilePath)) {
+    // Generate QR code and save it to a file
+    qrcode.toFile(qrFilePath, qr, (err) => {
+      if (err) {
+        console.error("Failed to generate QR code", err);
+        return;
+      }
+      console.log("QR code saved to", qrFilePath);
+      isQrGenerated = true;  // Set the flag to true once QR code is generated
+    });
+  } else {
+    console.log("QR code already generated, skipping regeneration.");
+  }
 
   console.log("📲 Scan the QR code by visiting http://localhost:3000/qr");
 });
