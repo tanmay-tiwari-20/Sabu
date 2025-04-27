@@ -49,12 +49,17 @@ client.on("qr", (qr) => {
       }
       console.log("QR code saved to", qrFilePath);
       isQrGenerated = true;  // Set the flag to true once QR code is generated
+      console.log("📲 Scan the QR code by visiting http://localhost:3000/qr");
+      
+      // Start the server after QR code is generated
+      const port = 3000;  // You can choose any port you like
+      app.listen(port, () => {
+        console.log(`Server is running at http://localhost:${port}`);
+      });
     });
   } else {
     console.log("QR code already generated, skipping regeneration.");
   }
-
-  console.log("📲 Scan the QR code by visiting http://localhost:3000/qr");
 });
 
 // Bot ready
@@ -118,10 +123,4 @@ client.on("message", async (message) => {
       }
     }
   }
-});
-
-// Start the Express server to serve the QR code image
-const port = 3000;  // You can choose any port you like
-app.listen(port, () => {
-  console.log(`Server is running at http://localhost:${port}`);
 });
