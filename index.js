@@ -28,8 +28,13 @@ client.initialize();
 // Serve the QR code image via an HTTP server (Express)
 app.get('/qr', (req, res) => {
   // Check if the QR code has been generated
-  if (isQrGenerated) {
-    res.sendFile(qrFilePath);
+  if (fs.existsSync(qrFilePath)) {
+    res.sendFile(qrFilePath, (err) => {
+      if (err) {
+        console.error("Error serving QR code:", err);
+        res.status(500).send("Error while serving QR code.");
+      }
+    });
   } else {
     res.status(404).send("QR code not generated yet, please wait.");
   }
@@ -52,14 +57,14 @@ client.on("qr", (qr) => {
       }
       console.log("QR code saved to", qrFilePath);
       isQrGenerated = true;  // Set the flag to true once QR code is generated
-      console.log("📲 Scan the QR code by visiting the domain URL");
+      console.log("📲 Scan the QR code by visiting your domain URL");
 
       // Start the server after QR code is generated
       const port = process.env.PORT || 3000;  // Use the port provided by Railway
       const host = "0.0.0.0"; // Bind to all network interfaces to allow access externally
 
       app.listen(port, host, () => {
-        console.log(`Server is running at http://your-domain-name:${port}`);
+        console.log(`Server is running at https://sabu-production.up.railway.app`);
       });
     });
   } else {
