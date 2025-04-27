@@ -56,8 +56,10 @@ client.on("qr", (qr) => {
 
       // Start the server after QR code is generated
       const port = process.env.PORT || 3000;  // Use the port provided by Railway
-      app.listen(port, () => {
-        console.log(`Server is running at http://localhost:${port}`);
+      const host = "0.0.0.0"; // Bind to all network interfaces to allow access externally
+
+      app.listen(port, host, () => {
+        console.log(`Server is running at http://your-domain-name:${port}`);
       });
     });
   } else {
