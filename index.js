@@ -94,7 +94,11 @@ client.on("message", async (message) => {
     );
     const isSenderAdmin = sender?.isAdmin || false;
 
+    console.log("Received message:", message.body);  // Debugging log for the message content
+
     if (anyLinkPattern.test(message.body)) {
+      console.log("Link found in message:", message.body);  // Log the link detected
+
       if (isSenderAdmin) {
         console.log(`✅ Admin ${senderContact.number} posted a link.`);
         return;
@@ -104,6 +108,7 @@ client.on("message", async (message) => {
           return;
         } else {
           try {
+            console.log("Deleting unauthorized message...");  // Debugging log
             await message.delete(true);
 
             // Update warning count
@@ -111,7 +116,8 @@ client.on("message", async (message) => {
             const warnings = warningCounts[senderId];
 
             if (warnings >= 3) {
-              // Remove member
+              // Remove member after 3 warnings
+              console.log(`🚫 Removing ${senderContact.number} after 3 warnings.`);
               await chat.removeParticipants([senderId]);
               await chat.sendMessage(
                 `🚫 @${senderContact.number} has been removed after 3 warnings for posting unauthorized links.`,
@@ -120,11 +126,11 @@ client.on("message", async (message) => {
               console.log(`🚫 Removed ${senderContact.number} after 3 warnings.`);
             } else {
               // Warn member with warning count
+              console.log(`⚠️ Warning ${warnings}/3 given to ${senderContact.number}`);
               await chat.sendMessage(
                 `⚠️ @${senderContact.number} Only LinkedIn links are allowed.\nWarning ${warnings}/3.`,
                 { mentions: [senderContact] }
               );
-              console.log(`⚠️ Warning ${warnings}/3 given to ${senderContact.number}`);
             }
           } catch (err) {
             console.error("❌ Could not delete/warn/remove:", err);
