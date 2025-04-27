@@ -1,5 +1,5 @@
-# Use official Node.js image
-FROM node:18
+# Use Node.js official image
+FROM node:18-slim
 
 # Install Chromium dependencies
 RUN apt-get update && apt-get install -y \
@@ -20,17 +20,24 @@ RUN apt-get update && apt-get install -y \
     libxdamage1 \
     libxrandr2 \
     xdg-utils \
-    --no-install-recommends
+    libdrm2 \
+    libgbm1 \
+    --no-install-recommends && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-# Create app directory
+# Set working directory
 WORKDIR /app
 
-# Copy package files and install dependencies
+# Copy package.json and install deps
 COPY package*.json ./
 RUN npm install
 
-# Copy rest of the app
+# Copy rest of the code
 COPY . .
 
-# Start the bot
+# Expose port if needed (optional)
+# EXPOSE 3000
+
+# Start the app
 CMD ["npm", "start"]
