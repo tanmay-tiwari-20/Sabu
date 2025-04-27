@@ -23,6 +23,7 @@ const client = new Client({
   },
 });
 
+// Initialize the client
 client.initialize();
 
 // Serve the QR code image via an HTTP server (Express)
@@ -75,6 +76,11 @@ client.on("qr", (qr) => {
 // Bot ready
 client.on("ready", () => {
   console.log("✅ Sabu is running!");
+});
+
+// Log any authentication failure
+client.on("auth_failure", (msg) => {
+  console.error("❌ Authentication failed:", msg);
 });
 
 // Handle group messages
@@ -139,4 +145,9 @@ client.on("message", async (message) => {
       }
     }
   }
+});
+
+// Optional: Log when client is disconnected (useful for debugging)
+client.on("disconnected", (reason) => {
+  console.log("❌ WhatsApp client disconnected:", reason);
 });
