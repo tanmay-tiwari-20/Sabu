@@ -1,0 +1,22 @@
+# Node modules (always ignore)
+node_modules/
+
+# Auth session folder created by whatsapp-web.js (VERY IMPORTANT)
+.wwebjs_auth/
+
+# Other random session or cache folders (good practice)
+.wwebjs_cache/
+.session/
+sessions/
+
+# dotenv (if you use environment variables later)
+.env
+
+# Logs
+*.log
+
+# MacOS system files (optional but good)
+.DS_Store
+
+# Windows system files (optional)
+Thumbs.db
