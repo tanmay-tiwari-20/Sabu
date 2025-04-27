@@ -52,10 +52,10 @@ client.on("qr", (qr) => {
       }
       console.log("QR code saved to", qrFilePath);
       isQrGenerated = true;  // Set the flag to true once QR code is generated
-      console.log("📲 Scan the QR code by visiting http://localhost:3000/qr");
-      
+      console.log("📲 Scan the QR code by visiting the domain URL");
+
       // Start the server after QR code is generated
-      const port = 3000;  // You can choose any port you like
+      const port = process.env.PORT || 3000;  // Use the port provided by Railway
       app.listen(port, () => {
         console.log(`Server is running at http://localhost:${port}`);
       });
