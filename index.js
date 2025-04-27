@@ -1,5 +1,12 @@
 const { Client, LocalAuth } = require("whatsapp-web.js");
-const qrcode = require("qrcode-terminal");
+const qrcode = require("qrcode");
+const fs = require("fs");
+const path = require("path");
+const express = require("express");
+const app = express();
+
+// Path to store the QR code image
+const qrFilePath = path.join(__dirname, "qr.png");
 
 // Start client
 const client = new Client({
@@ -11,11 +18,34 @@ const client = new Client({
 });
 client.initialize();
 
-const warningCounts = {}; // { userId: warningCount }
+// Serve the QR code image via an HTTP server (Express)
+app.get('/qr', (req, res) => {
+  // Check if the QR code file exists
+  if (fs.existsSync(qrFilePath)) {
+    res.sendFile(qrFilePath);
+  } else {
+    res.status(404).send("QR code not generated yet, please wait.");
+    console.log("qr not generated yet.")
+  }
+});
 
+// Serve a home route with a message
+app.get('/', (req, res) => {
+  res.send('<h1>Welcome to the WhatsApp Bot</h1><p>Scan the QR code: <a href="/qr">Click Here</a></p>');
+});
+
+// Generate and save QR code as an image file
 client.on("qr", (qr) => {
-  qrcode.generate(qr, { small: true });
-  console.log("📲 Scan the QR code above to connect!");
+  // Generate QR code and save it to a file
+  qrcode.toFile(qrFilePath, qr, (err) => {
+    if (err) {
+      console.error("Failed to generate QR code", err);
+      return;
+    }
+    console.log("QR code saved to", qrFilePath);
+  });
+
+  console.log("📲 Scan the QR code by visiting http://localhost:3000/qr");
 });
 
 // Bot ready
@@ -79,4 +109,10 @@ client.on("message", async (message) => {
       }
     }
   }
+});
+
+// Start the Express server to serve the QR code image
+const port = 3000;  // You can choose any port you like
+app.listen(port, () => {
+  console.log(`Server is running at http://localhost:${port}`);
 });
